@@ -1,8 +1,7 @@
 {
   "name": "koa-stark",
   "version": "0.1.0",
-  "description":
-    "Provides a set of `koa` middleware and optional CRUD resource(s)",
+  "description": "Provides a set of `koa` middleware and optional CRUD resource(s)",
   "main": "index.js",
   "dependencies": {
     "@koa/cors": "^2.2.1",

@@ -18,10 +18,10 @@ This module provides a set of `koa` middleware and optional CRUD resource(s). Mi
 Install using [npm](https://www.npmjs.org/):
 
 ```
-npm install koa-stark
+npm install johnschult/koa-stark
 ```
 
-### Usage
+## Usage
 
 ```javascript
 const Koa = require('koa')
@@ -48,22 +48,19 @@ The above creates a `koa` server with `koa-stark` middleware, where:
     * `path` - _required_, the path to the resource, e.g. `'/v1/clients'`
     * `schema` - _required_, the resource schema, a [mongoose.Schema](http://mongoosejs.com/docs/api.html#schema_Schema) object
 
-#### Options example
+## Example
 
-```javascript
-{
-  basePath: '/api',
-  mongo: 'mongodb://127.0.0.1/stark-industries',
-  swagger: {
-    ui: true,
-    validate: true
-  },
-  resources: [
-    {
-      name: 'Robot',
-      path: '/v1/robots',
-      schema: require('../resources/robots/v1/robot.schema')
-    }
-  ]
-}
+A simple `koa` application is included in the `example` directory.
+
+`koa-stark` is opinionated about the database being used and requires that you use MongoDB. Before running the example make changes to `mongo` in `example/config.js` as needed.
+
+To run this example:
+
+```shell
+$ git clone https://github.com/johnschult/koa-stark
+$ cd koa-stark && npm install
+$ cd example && npm install
+$ npm start
 ```
+
+Browse to http://localhost:9005/api to use the OpenAPI 2.0 UI.

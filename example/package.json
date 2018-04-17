@@ -1,0 +1,10 @@
+{
+  "name": "koa-stark-example",
+  "version": "0.0.1",
+  "private": true,
+  "main": "server.js",
+  "dependencies": {
+    "koa": "^2.5.0",
+    "mongoose": "^5.0.14"
+  }
+}
