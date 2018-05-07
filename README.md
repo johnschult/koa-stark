@@ -42,11 +42,11 @@ The above creates a `koa` server with `koa-stark` middleware, where:
   * `swagger` - _optional_, an object where:
     * `validate` - _optional_, if set to `true` will validate requests and responses using `swagger2-koa.validate`
     * `ui` - _optional_, if set to `true` will serve a [Swagger UI](https://swagger.io/swagger-ui/) at `options.basePath` using `swagger2-koa.ui`
-    * `spec` - _required if `ui` or `validate` are `true`_, an object that conforms to the [OpenAPI 2.0 schema](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
-  * `resources` - _required if `swagger.spec` includes paths that require CRUD_, an array of objects where:
+  * `resources` - _optional_, an array of objects where:
     * `name` - _required_, the name the resource, e.g. `'Robot'`
     * `path` - _required_, the path to the resource, e.g. `'/v1/clients'`
-    * `schema` - _required_, the resource schema, a [mongoose.Schema](http://mongoosejs.com/docs/api.html#schema_Schema) object
+    * `mongooseSchema` - _optional_, the resource schema, a [mongoose.Schema](http://mongoosejs.com/docs/api.html#schema_Schema) object, if provided, a CRUD controller and routes will be generated for this resource
+    * `swaggerSchema` - _required_, an [OpenAPI 2.0 Definitions Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#definitions-object)
 
 ## Example
 

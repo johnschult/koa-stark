@@ -11,9 +11,12 @@ const respond = require('koa-respond')
 const responseTime = require('koa-response-time')
 const logging = require('./logging')
 const swagger = require('./swagger')
+const errors = require('./errors')
 
 module.exports = options => {
   return compose([
+    respond(),
+    errors,
     responseTime(),
     helmet({
       frameguard: {
@@ -26,7 +29,6 @@ module.exports = options => {
     }),
     conditional(),
     etag(),
-    respond(),
     body({
       jsonLimit: '10kb' // Sets the json request body limit to 10k
     }),

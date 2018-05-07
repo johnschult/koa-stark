@@ -39,6 +39,10 @@ const destroy = async ctx => {
   client ? ctx.noContent() : ctx.notFound()
 }
 
+const count = async ctx => {
+  ctx.ok({ count: await Model.count({}) })
+}
+
 module.exports = model => {
   Model = model
   return {
@@ -46,6 +50,7 @@ module.exports = model => {
     show,
     create,
     update,
-    destroy
+    destroy,
+    count
   }
 }

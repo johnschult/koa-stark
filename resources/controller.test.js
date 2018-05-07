@@ -2,7 +2,7 @@
 
 const Koa = require('koa')
 const mongoose = require('mongoose')
-const stark = require('../..')
+const stark = require('../')
 const request = require('supertest')
 const sinon = require('sinon')
 require('sinon-mongoose')
@@ -16,7 +16,7 @@ const config = {
     {
       name: 'Robot',
       path: '/v1/robots',
-      schema: new mongoose.Schema({ name: { type: String } })
+      mongooseSchema: new mongoose.Schema({ name: { type: String } })
     }
   ]
 }
@@ -50,6 +50,25 @@ describe('resources: robots index', () => {
 
   test('returns an array', () => {
     expect(response.body).toMatchObject(allRobots)
+  })
+})
+
+describe('resources: robots count', () => {
+  let response
+
+  beforeEach(async () => {
+    RobotMock.expects('count')
+      .chain('exec')
+      .resolves(1)
+    response = await request(server).get(`${resourcePath}/count`)
+  })
+
+  test('responds with 200', () => {
+    expect(response.status).toEqual(200)
+  })
+
+  test('returns an object', () => {
+    expect(response.body).toMatchObject({count: 1})
   })
 })
 
