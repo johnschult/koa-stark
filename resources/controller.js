@@ -2,45 +2,52 @@
 
 let Model
 
-const index = async ctx => {
-  ctx.ok(await Model.find({}))
+const index = async ({ ok, request: { query: { where = '{}' } } }) => {
+  ok(await Model.find(JSON.parse(where)))
 }
 
-const show = async ctx => {
-  const client = await Model.findById(ctx.params.id)
-  client ? ctx.ok(client) : ctx.notFound()
+const show = async ({ ok, notFound, params: { id } }) => {
+  const model = await Model.findById(id)
+  model ? ok(model) : notFound()
 }
 
-const create = async ctx => {
+const create = async ({ created, badRequest, request: { body } }) => {
   try {
-    ctx.created(await Model.create(ctx.request.body))
+    created(await Model.create(body))
   } catch (err) {
-    ctx.badRequest(err)
+    badRequest(err)
   }
 }
 
-const update = async ctx => {
+const update = async ({
+  noContent,
+  notFound,
+  badRequest,
+  params: { id },
+  request: { body }
+}) => {
   try {
-    const client = await Model.findByIdAndUpdate(
-      ctx.params.id,
-      ctx.request.body,
-      {
-        runValidators: true
-      }
-    )
-    client ? ctx.noContent() : ctx.notFound()
+    const model = await Model.findByIdAndUpdate(id, body, {
+      runValidators: true
+    })
+    model ? noContent() : notFound()
   } catch (err) {
-    ctx.badRequest(err)
+    badRequest(err)
   }
 }
 
-const destroy = async ctx => {
-  const client = await Model.findByIdAndRemove(ctx.params.id)
-  client ? ctx.noContent() : ctx.notFound()
+const destroy = async ({ noContent, notFound, params: { id } }) => {
+  const model = await Model.findByIdAndRemove(id)
+  model ? noContent() : notFound()
 }
 
-const count = async ctx => {
-  ctx.ok({ count: await Model.count({}) })
+const count = async ({ ok, request: { query: { where = '{}' } } }) => {
+  ok({ count: await Model.count(JSON.parse(where)) })
+}
+
+const exists = async ({ ok, params: { id } }) => {
+  const model = await Model.findById(id)
+  ok({ exists: model !== undefined })
 }
 
 module.exports = model => {
@@ -51,6 +58,7 @@ module.exports = model => {
     create,
     update,
     destroy,
-    count
+    count,
+    exists
   }
 }

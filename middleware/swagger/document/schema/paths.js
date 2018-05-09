@@ -8,19 +8,11 @@ module.exports = resource => {
   const otherPaths = {}
 
   collectionPaths[path] = {
-    options: {
-      summary: 'Get the allowed HTTP methods',
-      tags: [path],
-      operationId: `${name}.options`,
-      description: 'The HTTP methods that are allowed for this path',
-      responses: {
-        '200': { $ref: '#/responses/optionsSuccess' }
-      }
-    },
     get: {
       summary: `Returns an array of all the ${pluralResourceName}`,
       tags: [path],
       operationId: `${name}.index`,
+      parameters: [{ $ref: '#/parameters/where' }],
       responses: {
         '200': {
           description: 'OK',
@@ -34,21 +26,11 @@ module.exports = resource => {
       }
     },
     post: {
-      summary: `Add a new ${lowerCaseName}`,
+      summary: `Creates a new ${lowerCaseName}`,
       tags: [path],
       operationId: `${name}.create`,
       description: '',
-      parameters: [
-        {
-          in: 'body',
-          name: 'body',
-          description: `${name} object that needs to be added`,
-          required: true,
-          schema: {
-            $ref: `#/definitions/${name}`
-          }
-        }
-      ],
+      parameters: [{ $ref: `#/parameters/${lowerCaseName}Model` }],
       responses: {
         '201': {
           description: 'Created',
@@ -62,71 +44,32 @@ module.exports = resource => {
   }
 
   instancePaths[`${path}/{id}`] = {
-    parameters: [
-      {
-        name: 'id',
-        in: 'path',
-        description: `ID of a ${lowerCaseName}`,
-        required: true,
-        type: 'string'
-      }
-    ],
-    options: {
-      summary: 'Get the allowed HTTP methods',
-      tags: [path],
-      operationId: `${name}.instance_options`,
-      description: 'The HTTP methods that are allowed for this path',
-      responses: {
-        '200': { $ref: '#/responses/optionsSuccess' }
-      }
-    },
+    parameters: [{ $ref: '#/parameters/id' }],
     get: {
-      summary: `Find ${lowerCaseName} by ID`,
+      summary: `Finds a ${lowerCaseName} by ID`,
       tags: [path],
       operationId: `${name}.show`,
       description: `Returns a single ${lowerCaseName}`,
-      parameters: [
-        {
-          name: 'id',
-          in: 'path',
-          description: `ID of ${lowerCaseName} to return`,
-          required: true,
-          type: 'string'
-        }
-      ],
+      parameters: [{ $ref: '#/parameters/id' }],
       responses: {
         '200': {
-          description: 'Successful operation',
+          description: 'OK',
           schema: {
             $ref: `#/definitions/${name}`
           }
         },
-        '400': { $ref: '#/responses/invalidResourceId' },
+        '422': { $ref: '#/responses/unprocessableEntity' },
         '404': { $ref: '#/responses/notFound' }
       }
     },
     put: {
-      summary: `Update an existing ${lowerCaseName}`,
+      summary: `Updates an existing ${lowerCaseName}`,
       tags: [path],
       operationId: `${name}.update`,
-      description: '',
+      description: `Updates a single ${lowerCaseName}`,
       parameters: [
-        {
-          name: 'id',
-          in: 'path',
-          description: `${name} id to delete`,
-          required: true,
-          type: 'string'
-        },
-        {
-          in: 'body',
-          name: 'body',
-          description: `${name} object that needs to be updated`,
-          required: true,
-          schema: {
-            $ref: `#/definitions/${name}`
-          }
-        }
+        { $ref: '#/parameters/id' },
+        { $ref: `#/parameters/${lowerCaseName}Model` }
       ],
       responses: {
         '204': { $ref: '#/responses/noContent' },
@@ -139,38 +82,42 @@ module.exports = resource => {
       tags: [path],
       operationId: `${name}.destroy`,
       description: '',
-      parameters: [
-        {
-          name: 'id',
-          in: 'path',
-          description: `The id of the ${name}`,
-          required: true,
-          type: 'string'
-        }
-      ],
+      parameters: [{ $ref: '#/parameters/id' }],
       responses: {
         '204': { $ref: '#/responses/noContent' },
-        '400': { $ref: '#/responses/invalidResourceId' },
+        '422': { $ref: '#/responses/unprocessableEntity' },
         '404': { $ref: '#/responses/notFound' }
       }
     }
   }
 
+  otherPaths[`${path}/{id}/exists`] = {
+    get: {
+      summary: `Checks whether a ${lowerCaseName} exists`,
+      tags: [path],
+      operationId: `${name}.exists`,
+      parameters: [{ $ref: '#/parameters/id' }],
+      responses: {
+        '200': {
+          description: 'OK',
+          schema: {
+            type: 'object',
+            properties: {
+              exists: {
+                type: 'boolean'
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   otherPaths[`${path}/count`] = {
     get: {
       summary: `Returns a count of all the ${pluralResourceName}`,
       tags: [path],
       operationId: `${name}.count`,
-      parameters: [
-        {
-          name: 'where',
-          in: 'query',
-          description: 'Criteria to match model instances',
-          required: false,
-          type: 'string',
-          format: 'JSON'
-        }
-      ],
+      parameters: [{ $ref: '#/parameters/where' }],
       responses: {
         '200': {
           description: 'OK',
@@ -188,5 +135,5 @@ module.exports = resource => {
     }
   }
 
-  return Object.assign(collectionPaths, otherPaths, instancePaths)
+  return { ...collectionPaths, ...instancePaths, ...otherPaths }
 }

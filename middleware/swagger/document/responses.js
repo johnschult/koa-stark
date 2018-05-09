@@ -1,15 +1,6 @@
 'use strict'
 
 module.exports = {
-  optionsSuccess: {
-    description: 'OK',
-    headers: {
-      Allow: {
-        description: 'The HTTP methods that are allowed for this path',
-        type: 'string'
-      }
-    }
-  },
   badRequest: {
     description: 'Bad Request',
     schema: {
@@ -17,10 +8,19 @@ module.exports = {
     }
   },
   notFound: {
-    description: `Resource not found`
+    description: 'Not Found'
   },
-  invalidResourceId: {
-    description: 'Invalid ID supplied'
+  unprocessableEntity: {
+    description: 'Unprocessable Entity',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: 'Invalid ID supplied'
+        }
+      }
+    }
   },
   noContent: {
     description: 'No Content'

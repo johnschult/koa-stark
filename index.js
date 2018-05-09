@@ -2,11 +2,7 @@
 
 const compose = require('koa-compose')
 
-module.exports = options => {
-  const resources = require('./resources')(options)
-  return compose([
-    require('./middleware')(options),
-    resources.routes(),
-    resources.allowedMethods()
-  ])
+module.exports = (options, app) => {
+  const resources = require('./resources')(options, app)
+  return compose([require('./middleware')(options), resources.routes()])
 }

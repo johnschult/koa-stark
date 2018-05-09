@@ -22,7 +22,7 @@ const config = {
 }
 
 const app = new Koa()
-app.use(stark(config))
+app.use(stark(config, app))
 const server = app.listen(config.port)
 
 const { name, path, schema } = config.resources[0]
@@ -68,14 +68,67 @@ describe('resources: robots count', () => {
   })
 
   test('returns an object', () => {
-    expect(response.body).toMatchObject({count: 1})
+    expect(response.body).toMatchObject({ count: 1 })
   })
 })
 
-let model = { name: 'the model' }
+let model = { name: 'the robot' }
 let modelId = '507f191e810c19729de860ea'
 
-describe('resources: robots show', () => {
+describe('resources: robot exists', () => {
+  let response
+
+  describe('success', () => {
+    describe('when model is found', () => {
+      beforeEach(async () => {
+        RobotMock.expects('findById')
+          .withArgs(modelId)
+          .chain('exec')
+          .resolves(model)
+        response = await request(server).get(
+          `${resourcePath}/${modelId}/exists`
+        )
+      })
+
+      test('responds with 200', () => {
+        expect(response.status).toEqual(200)
+      })
+
+      test('returns { exists: true }', () => {
+        expect(response.body).toMatchObject({ exists: true })
+      })
+    })
+
+    describe('when model is not found', () => {
+      beforeEach(async () => {
+        RobotMock.expects('findById')
+          .withArgs(modelId)
+          .chain('exec')
+          .resolves(undefined)
+        response = await request(server).get(
+          `${resourcePath}/${modelId}/exists`
+        )
+      })
+
+      test('responds with 200', () => {
+        expect(response.status).toEqual(200)
+      })
+
+      test('returns { exists: false }', () => {
+        expect(response.body).toMatchObject({ exists: false })
+      })
+    })
+  })
+
+  describe('failure', () => {
+    test('responds with 422 when the id is malformed', async () => {
+      response = await request(server).get(`${resourcePath}/foo/exists`)
+      expect(response.status).toEqual(422)
+    })
+  })
+})
+
+describe('resources: robot show', () => {
   let response
 
   describe('success', () => {
@@ -108,7 +161,7 @@ describe('resources: robots show', () => {
 
     test('responds with 400 when the id is malformed', async () => {
       response = await request(server).get(`${resourcePath}/foo`)
-      expect(response.status).toEqual(400)
+      expect(response.status).toEqual(422)
     })
   })
 })
@@ -161,7 +214,7 @@ describe('resources: robots create', () => {
   })
 })
 
-describe('resources: robots update', () => {
+describe('resources: robot update', () => {
   let response
 
   describe('success', () => {
@@ -209,7 +262,7 @@ describe('resources: robots update', () => {
   })
 })
 
-describe('resources: robots delete', () => {
+describe('resources: robot delete', () => {
   let response
 
   beforeEach(async () => {

@@ -7,5 +7,5 @@ module.exports = resources => {
     const { name, swaggerSchema } = r
     definitions[name] = swaggerSchema
   }
-  return Object.assign(definitions, { Error: errorSchema })
+  return { ...definitions, Error: errorSchema }
 }

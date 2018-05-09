@@ -15,8 +15,8 @@ module.exports = options => {
     }
     if (useUi) {
       const { ui } = require('swagger2-koa')
-      const { swagger: { paths: configPaths = {} } } = options
-      const skipPaths = Object.keys(configPaths)
+      const { swagger: { paths = {} } } = options
+      const skipPaths = Object.keys(paths)
         .map(p => `${basePath}${p}`)
         .concat(resources.map(r => `${basePath}${r.path}`))
       middleware.push(ui(spec, basePath, skipPaths))

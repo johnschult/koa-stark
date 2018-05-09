@@ -3,6 +3,7 @@
 const merge = require('deepmerge')
 const pathsFor = require('./paths')
 const definitionsFor = require('./definitions')
+const parametersFor = require('./parameters')
 const tagsFor = require('./tags')
 
 module.exports = options => {
@@ -18,6 +19,7 @@ module.exports = options => {
       paths = {},
       definitions = {},
       responses = {},
+      parameters = {},
       tags = [],
       externalDocs = {
         description:
@@ -40,6 +42,7 @@ module.exports = options => {
     paths: merge(paths, pathsFor(resources)),
     definitions: merge(definitions, definitionsFor(resources)),
     responses: merge(responses, require('./responses')),
+    parameters: merge(parameters, parametersFor(resources)),
     tags: tags.concat(tagsFor(resources)),
     externalDocs
   }
