@@ -12,8 +12,10 @@ const responseTime = require('koa-response-time')
 const logging = require('./logging')
 const swagger = require('./swagger')
 const errors = require('./errors')
+const debug = require('debug')('koa-stark:init:middleware')
 
 module.exports = options => {
+  debug('initializing middleware')
   return compose([
     respond(),
     errors,

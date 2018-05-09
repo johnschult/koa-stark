@@ -1,12 +1,12 @@
 {
   "name": "koa-stark",
-  "version": "0.2.0",
-  "description":
-    "Provides a set of `koa` middleware and optional CRUD resource(s)",
+  "version": "0.2.1",
+  "description": "Provides a set of `koa` middleware and optional CRUD resource(s)",
   "main": "index.js",
   "dependencies": {
     "@koa/cors": "^2.2.1",
     "@meanie/mongoose-to-json": "^2.2.0",
+    "debug": "^3.1.0",
     "deepmerge": "^2.1.0",
     "koa-body": "^2.5.0",
     "koa-bunyan-logger": "^2.0.0",
@@ -19,23 +19,28 @@
     "koa-respond": "^1.0.1",
     "koa-response-time": "^2.0.0",
     "koa-socket": "^4.4.0",
+    "mongoose": "^5.0.14",
     "swagger2": "github:johnschult/swagger2",
     "swagger2-koa": "github:johnschult/swagger2-koa"
   },
   "devDependencies": {
+    "command-line-args": "^5.0.2",
+    "command-line-usage": "^5.0.5",
     "eslint": "^4.19.1",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-import": "^2.10.0",
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-promise": "^3.7.0",
     "eslint-plugin-standard": "^3.0.1",
+    "koa": "^2.5.1",
     "sinon": "^4.5.0",
     "sinon-mongoose": "^2.1.1",
     "supertest": "^3.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev-test": "jest --watchAll --notify --notifyMode=change"
+    "dev-test": "jest --watchAll --notify --notifyMode=change",
+    "example": "node example/server.js | pino"
   },
   "author": "John Schult <js798p@att.com>",
   "license": "UNLICENSED"

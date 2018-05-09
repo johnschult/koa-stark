@@ -1,4 +1,10 @@
 'use strict'
+const debug = require('debug')
+const resourcesDebugLog = debug('koa-stark:init:resources')
+const routerDebugLog = debug('koa-stark:run:router')
+const socketDebugLog = debug('koa-stark:run:socket')
+
+const util = require('util')
 
 const mongoose = require('mongoose')
 const IO = require('koa-socket')
@@ -6,10 +12,11 @@ const toJson = require('@meanie/mongoose-to-json')
 
 mongoose.plugin(toJson)
 
-const validateObjectId = (id, ctx, next) =>
-  mongoose.Types.ObjectId.isValid(id)
-    ? next()
-    : ctx.send(422, 'Invalid ID supplied')
+const validateObjectId = (id, ctx, next) => {
+  routerDebugLog(`validating object id: ${id}`)
+  if (mongoose.Types.ObjectId.isValid(id)) return next()
+  ctx.send(422, 'Invalid ID supplied')
+}
 
 const createPipeline = ({ id, operationType }) => {
   const pipeline = []
@@ -33,57 +40,74 @@ const createPipeline = ({ id, operationType }) => {
       'fullDocument.__v': false
     }
   })
-
+  socketDebugLog(`watch pipeline is: ${util.inspect(pipeline)}`)
   return pipeline
 }
 
-const addChangeStream = (prefix, { name }, app) => {
+const addWatchStream = (prefix, { name }, app) => {
+  resourcesDebugLog(`adding watch stream for: ${name}`)
   const io = new IO(`${prefix}/watch`)
   io.attach(app)
 
   io.on('watch', ({ socket }, { id, operationType } = {}) => {
+    socketDebugLog(
+      `client connected to watch and sent: ${util.inspect({
+        id,
+        operationType
+      })}`
+    )
     const pipeline = createPipeline({ id, operationType })
     const { driverChangeStream } = mongoose
       .model(name)
       .watch(pipeline, {
         fullDocument: 'updateLookup'
       })
-      .on('change', ({ documentKey, operationType, fullDocument }) => {
+      .on('change', change => {
+        const { documentKey, operationType, fullDocument } = change
+        socketDebugLog(`emitting change to client: ${util.inspect(change)}`)
         socket.emit('change', {
           operationType,
           model: { id: documentKey._id, ...fullDocument }
         })
       })
 
-    socket.on('done', data => {
-      socket.disconnect()
+    socket.on('disconnect', () => {
+      socketDebugLog('client disconnected, closing mongo watch stream')
       driverChangeStream.close()
     })
   })
 }
 
 const addResourceRoutes = (prefix, { name, mongooseSchema, path }, router) => {
-  if (mongooseSchema) {
-    const ctlr = require('./controller')(mongoose.model(name, mongooseSchema))
+  resourcesDebugLog(`adding resource routes for: ${name}`)
+  const ctlr = require('./controller')(mongoose.model(name, mongooseSchema))
 
-    router.prefix(prefix)
-    router.post('/', ctlr.create)
-    router.get('/', ctlr.index)
-    router.get('/count', ctlr.count)
-    router.get('/:id/exists', ctlr.exists)
-    router.param('id', validateObjectId).get('/:id', ctlr.show)
-    router.param('id', validateObjectId).put('/:id', ctlr.update)
-    router.param('id', validateObjectId).delete('/:id', ctlr.destroy)
-  }
+  router.prefix(prefix)
+  router.post('/', ctlr.create)
+  router.get('/', ctlr.index)
+  router.get('/count', ctlr.count)
+  router
+    .param('id', validateObjectId)
+    .get('/:id', ctlr.show)
+    .get('/:id/exists', ctlr.exists)
+    .put('/:id', ctlr.update)
+    .delete('/:id', ctlr.destroy)
 }
 
 module.exports = ({ mongo, basePath, resources }, app) => {
-  mongo && mongoose.connect(mongo)
+  resourcesDebugLog('loading resources')
+  if (mongo) {
+    resourcesDebugLog(`connecting to mongo using: ${mongo}`)
+    mongoose.connect(mongo)
+  }
   const router = require('koa-router')()
   for (let r of resources) {
+    resourcesDebugLog(`loading resource: ${util.inspect(r)}`)
     const prefix = `${basePath}${r.path}`
-    addResourceRoutes(prefix, r, router)
-    addChangeStream(prefix, r, app)
+    if (r.mongooseSchema) {
+      addResourceRoutes(prefix, r, router)
+      addWatchStream(prefix, r, app)
+    }
   }
   return router
 }

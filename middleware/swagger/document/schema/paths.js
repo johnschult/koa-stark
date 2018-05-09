@@ -108,7 +108,8 @@ module.exports = resource => {
               }
             }
           }
-        }
+        },
+        '422': { $ref: '#/responses/unprocessableEntity' }
       }
     }
   }

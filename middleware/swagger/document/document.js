@@ -5,6 +5,8 @@ const pathsFor = require('./paths')
 const definitionsFor = require('./definitions')
 const parametersFor = require('./parameters')
 const tagsFor = require('./tags')
+const debug = require('debug')('koa-stark:init:middleware:swagger:doc')
+const util = require('util')
 
 module.exports = options => {
   const {
@@ -31,7 +33,7 @@ module.exports = options => {
     resources = []
   } = options
 
-  return {
+  const spec = {
     swagger: '2.0',
     info,
     host: port !== 80 ? `${host}:${port}` : host,
@@ -46,4 +48,6 @@ module.exports = options => {
     tags: tags.concat(tagsFor(resources)),
     externalDocs
   }
+  debug(`generated swagger spec: ${util.inspect(spec)}`)
+  return spec
 }

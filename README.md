@@ -145,8 +145,7 @@ To run this example:
 ```shell
 $ git clone https://github.com/johnschult/koa-stark
 $ cd koa-stark && npm install
-$ cd example && npm install
-$ npm start
+$ npm run example
 ```
 
 Browse to http://localhost:9005/api to use the OpenAPI 2.0 UI.
