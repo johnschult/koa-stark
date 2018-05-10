@@ -104,7 +104,7 @@ describe('resources: robot exists', () => {
         RobotMock.expects('findById')
           .withArgs(modelId)
           .chain('exec')
-          .resolves(undefined)
+          .resolves(null)
         response = await request(server).get(
           `${resourcePath}/${modelId}/exists`
         )

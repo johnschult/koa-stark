@@ -80,8 +80,6 @@ const socket = io('ws://localhost:9006/api/v1/robots/watch')
   in observing, _optional_ object where:
   * `id` - _optional_, the resource `id`
   * `operationType` - _optional_, one of `insert, update, delete`
-* `done` - Indicates to the server that you are done. The server will close the
-  watch stream, and disconnect.
 
 ##### Server
 
