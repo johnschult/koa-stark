@@ -1,8 +1,10 @@
 'use strict'
-const debug = require('debug')('koa-stark:run:controller')
+
 const util = require('util')
+const mongoose = require('mongoose')
 
 let Model
+let debug
 
 const index = async ({ ok, request: { query: { where = '{}' } } }) => {
   debug(`index: ${util.inspect(where)}`)
@@ -63,8 +65,10 @@ const exists = async ({ ok, params: { id } }) => {
   ok({ exists: model !== null })
 }
 
-module.exports = model => {
-  Model = model
+module.exports = (name, schema) => {
+  Model = mongoose.model(name, schema)
+  debug = require('debug')(`koa-stark:run:controller:${name.toLowerCase()}`)
+
   return {
     index,
     show,

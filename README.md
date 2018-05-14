@@ -79,12 +79,11 @@ const socket = io('ws://localhost:9006/api/v1/robots/watch')
 * `watch` - Used to define the resources and operations you are interested
   in observing, _optional_ object where:
   * `id` - _optional_, the resource `id`
-  * `operationType` - _optional_, one of `insert, update, delete`
+  * `operationType` - _optional_, any of `insert, update, delete` as a comma separated string
 
 ##### Server
 
-* `change` - The server emits changes to this event. A single argument is sent to the callback containing
-  the change data.
+* `change` - The server emits changes to this event. A single argument is sent to the callback containing the change data.
 
 ##### Examples
 
@@ -108,7 +107,7 @@ socket.on('disconnect', () => {
 })
 ```
 
-**Watch all update operation on a single resource instances and then tell the server you are done:**
+**Watch all update operation on a single resource instances and disconnect after first change is emitted:**
 
 ```javascript
 const io = require('socket.io-client')
@@ -118,13 +117,13 @@ const socket = io('ws://localhost:9006/api/v1/robots/watch')
 socket.on('connect', () => {
   socket.emit('watch', {
     operationType: 'update',
-    id: '5af2fe000e488a70acf4be22'
+    id: '5af2fe000e488a70acf4be22',
+    disconnect: true
   })
 })
 
 socket.on('change', data => {
   console.log(data)
-  socket.emit('done')
 })
 
 socket.on('disconnect', () => {
@@ -143,7 +142,8 @@ To run this example:
 ```shell
 $ git clone https://github.com/johnschult/koa-stark
 $ cd koa-stark && npm install
+$ npm run mongod
 $ npm run example
 ```
 
-Browse to http://localhost:9005/api to use the OpenAPI 2.0 UI.
+Browse to http://localhost:9006/api to use the example OpenAPI 2.0 UI.

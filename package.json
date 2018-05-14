@@ -1,8 +1,7 @@
 {
   "name": "koa-stark",
-  "version": "0.2.2",
-  "description":
-    "Provides a set of `koa` middleware and optional CRUD resource(s)",
+  "version": "0.2.3",
+  "description": "Provides a set of `koa` middleware and optional CRUD resource(s)",
   "main": "index.js",
   "dependencies": {
     "@koa/cors": "^2.2.1",
@@ -20,28 +19,31 @@
     "koa-respond": "^1.0.1",
     "koa-response-time": "^2.0.0",
     "koa-socket": "github:johnschult/koa-socket",
-    "mongoose": "^5.0.14",
+    "mongoose": "^5.1.0",
+    "ramda": "^0.25.0",
     "swagger2": "github:johnschult/swagger2",
     "swagger2-koa": "github:johnschult/swagger2-koa"
   },
   "devDependencies": {
     "command-line-args": "^5.0.2",
     "command-line-usage": "^5.0.5",
+    "concurrently": "^3.5.1",
     "eslint": "^4.19.1",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-import": "^2.10.0",
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-promise": "^3.7.0",
-    "eslint-plugin-standard": "^3.0.1",
+    "eslint-plugin-standard": "^3.1.0",
     "koa": "^2.5.1",
     "sinon": "^4.5.0",
     "sinon-mongoose": "^2.1.1",
-    "supertest": "^3.0.0"
+    "supertest": "^3.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev-test": "jest --watchAll --notify --notifyMode=change",
-    "example": "node example/server.js | pino"
+    "example": "node example/server.js | pino",
+    "mongod": "concurrently -n 27017,27018,27019 -c green,yellow,blue 'mongod --replSet rs0 --port 27017 --bind_ip localhost --dbpath /tmp/mongodb/rs0-0 --smallfiles --oplogSize 128' 'mongod --replSet rs0 --port 27018 --bind_ip localhost --dbpath /tmp/mongodb/rs0-1 --smallfiles --oplogSize 128' 'mongod --replSet rs0 --port 27019 --bind_ip localhost --dbpath /tmp/mongodb/rs0-2 --smallfiles --oplogSize 128'"
   },
   "author": "John Schult <js798p@att.com>",
   "license": "UNLICENSED"

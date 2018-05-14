@@ -1,23 +1,23 @@
 const Koa = require('koa')
-const router = require('koa-router')()
 const stark = require('../')
-const config = require('./config')
+const options = require('./options')
 const app = new Koa()
+const { basePath, port, host, swagger: { ui } } = options
 
-app.use(stark(config, app))
+app.use(stark(options, app))
 
 app.use(
-  router
-    .get('/api/v1/hello', (ctx, next) => {
+  require('koa-router')()
+    .get('/api/v1/hello', ctx => {
       ctx.body = { message: 'hello' }
     })
     .routes()
 )
 
-app.listen(config.port, config.host)
+app.listen(port, host)
 
-if (config.swagger.ui) {
+if (ui) {
   console.log(
-    `OpenAPI 2.0 UI: http://${config.host}:${config.port}${config.basePath}`
+    `Server started: OpenAPI 2.0 UI: http://${host}:${port}${basePath}`
   )
 }
