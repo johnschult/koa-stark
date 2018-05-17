@@ -4,7 +4,7 @@ const body = require('koa-body')
 const compose = require('koa-compose')
 const compress = require('koa-compress')
 const conditional = require('koa-conditional-get')
-const cors = require('@koa/cors')
+const cors = require('koa2-cors')
 const etag = require('koa-etag')
 const helmet = require('koa-helmet')
 const respond = require('koa-respond')
@@ -13,6 +13,7 @@ const logging = require('./logging')
 const swagger = require('./swagger')
 const errors = require('./errors')
 const debug = require('debug')('koa-stark:init:middleware')
+const metrics = require('./metrics')
 
 module.exports = options => {
   debug('initializing middleware')
@@ -25,7 +26,9 @@ module.exports = options => {
         action: 'deny' // Set the `X-Frame-Options' header to be `DENY`
       }
     }),
-    cors(),
+    cors({
+      origin: '*'
+    }),
     compress({
       threshold: 2048 // Sets the threshold to Gzip responses at 2k (2048 bytes)
     }),
@@ -35,6 +38,7 @@ module.exports = options => {
       jsonLimit: '10kb' // Sets the json request body limit to 10k
     }),
     ...logging(options),
-    ...swagger(options)
+    ...swagger(options),
+    metrics(options)
   ])
 }

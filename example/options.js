@@ -3,7 +3,7 @@ module.exports = {
   port: 9006,
   basePath: '/api',
   mongo:
-    'mongodb://localhost:27017,locahost:27018,localhost:27019/stark-industries?replicaSet=rs0',
+    'mongodb://localhost:27017,localhost:27018,localhost:27019/stark-industries?replicaSet=rs0',
   logging: true,
   swagger: {
     info: {

@@ -19,7 +19,9 @@
     "koa-respond": "^1.0.1",
     "koa-response-time": "^2.0.0",
     "koa-socket": "github:johnschult/koa-socket",
+    "koa2-cors": "^2.0.5",
     "mongoose": "^5.1.0",
+    "prom-client": "^11.0.0",
     "ramda": "^0.25.0",
     "swagger2": "github:johnschult/swagger2",
     "swagger2-koa": "github:johnschult/swagger2-koa"

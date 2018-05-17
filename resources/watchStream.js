@@ -36,12 +36,22 @@ const createPipeline = ({ id, operationType }) => {
   return pipeline
 }
 
-module.exports = (prefix, { name }) => {
+module.exports = (prefix, { name }, prometheusClient) => {
   socketDebugLog = debug(`koa-stark:run:socket:${name.toLowerCase()}`)
   resourcesDebugLog(`adding watch stream for: ${name}`)
+  const watchHistogram = new prometheusClient.Histogram({
+    name: `${name.toLowerCase()}_watch_requests`,
+    help: `used to keep track of socket connections for ${name.toLowerCase()} watch`,
+    labelNames: ['action'],
+    buckets: [60, 120, 180, 240, 300, 360, 420, 480]
+  })
+  let end
+
   return new IO(`${prefix}/watch`).on(
     'watch',
     ({ socket }, { id, operationType } = {}) => {
+      end = watchHistogram.startTimer({ action: 'watch' })
+
       socketDebugLog(
         `client connected to watch and sent: ${util.inspect({
           id,
@@ -66,6 +76,7 @@ module.exports = (prefix, { name }) => {
       socket.on('disconnect', () => {
         socketDebugLog('client disconnected, closing mongo watch stream')
         driverChangeStream.close()
+        end()
       })
     }
   )
